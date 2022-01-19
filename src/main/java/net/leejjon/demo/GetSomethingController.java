@@ -22,8 +22,8 @@ public class GetSomethingController {
     public String getSomething() {
         try {
             businessLogic.doBusinessLogic();
-        } catch (Exception) {
-
+        } catch (Exception e) {
+            log.error("Something went wrong doing the business logic: " + e.getMessage(), e);
         }
         return "Hello";
     }
