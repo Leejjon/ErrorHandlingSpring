@@ -20,19 +20,11 @@ public class GetSomethingController {
 
     @GetMapping("/")
     public String getSomething() {
-        businessLogic.doBusinessLogic();
+        try {
+            businessLogic.doBusinessLogic();
+        } catch (Exception) {
+
+        }
         return "Hello";
-    }
-
-    @ExceptionHandler(AlreadyLoggedException.class)
-    public String handleAlreadyLoggedException() {
-        // Don't log because we already did.
-        return "Error";
-    }
-
-    @ExceptionHandler(Exception.class)
-    public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
-        log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
-        return "Error";
     }
 }
