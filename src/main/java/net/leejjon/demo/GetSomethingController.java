@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @RestController
 public class GetSomethingController {
@@ -26,8 +28,8 @@ public class GetSomethingController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrors(Exception e) {
-        // You should log the exception here!
+    public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
+        log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
         return "Error";
     }
 }
