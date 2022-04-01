@@ -5,21 +5,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
-import java.util.Random;
 
 @Service
 @Slf4j
 public class DatabaseService {
     @SneakyThrows
-    public void runQuery(boolean withFilter) {
+    public void runQuery(boolean extraParam) {
         try {
-            if (new Random().nextBoolean()) {
+            if (extraParam) {
                 throw new SQLException();
             }
         } catch (SQLException e) {
-            log.debug("Got error " + e.getMessage() +
-                    " on query select * from data where filter = " + withFilter, e);
-            throw new AlreadyLoggedException(e);
+            log.error("Got error " + e.getMessage() +
+                    " on query select * from data where extraParam = " + extraParam, e);
+            throw e;
         }
     }
 }

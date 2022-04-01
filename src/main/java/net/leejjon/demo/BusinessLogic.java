@@ -3,6 +3,8 @@ package net.leejjon.demo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class BusinessLogic {
     private final DatabaseService databaseService;
@@ -14,6 +16,6 @@ public class BusinessLogic {
 
     public void doBusinessLogic() {
         // TODO: Pretend there is happening some logic
-        databaseService.runQuery(true);
+        databaseService.runQuery(new Random().nextBoolean());
     }
 }
