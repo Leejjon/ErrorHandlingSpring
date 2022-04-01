@@ -10,7 +10,8 @@ import java.util.Random;
 @Service
 @Slf4j
 public class DatabaseService {
-    public void runQuery() throws SQLException {
+    @SneakyThrows
+    public void runQuery() {
         if (new Random().nextBoolean()) {
             throw new SQLException();
         }

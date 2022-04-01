@@ -3,8 +3,6 @@ package net.leejjon.demo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
-
 @Component
 public class BusinessLogic {
     private final DatabaseService databaseService;
@@ -14,7 +12,7 @@ public class BusinessLogic {
         this.databaseService = databaseService;
     }
 
-    public void doBusinessLogic() throws SQLException {
+    public void doBusinessLogic() {
         // TODO: Pretend there is happening some logic
         databaseService.runQuery();
     }
