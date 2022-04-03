@@ -26,9 +26,9 @@ public class GetSomethingController {
         return "Hello";
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(AlreadyLoggedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrors() {
+    public String handleUnexpectedErrorsThatAreAlreadyLogged() {
         // Do not log
         return "Error";
     }
