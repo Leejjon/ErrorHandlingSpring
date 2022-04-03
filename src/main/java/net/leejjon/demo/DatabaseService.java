@@ -18,7 +18,7 @@ public class DatabaseService {
         } catch (SQLException e) {
             log.error("Got error " + e.getMessage() +
                     " on query select * from data where extraParam = " + extraParam, e);
-            throw e;
+            throw new AlreadyLoggedException(e);
         }
     }
 }
