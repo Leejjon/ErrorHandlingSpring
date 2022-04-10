@@ -1,7 +1,13 @@
 package net.leejjon.demo;
 
+import lombok.Getter;
+
 public class AlreadyLoggedException extends RuntimeException {
-    public AlreadyLoggedException(Exception e) {
+    @Getter
+    private final String uuid;
+
+    public AlreadyLoggedException(Exception e, final String uuid) {
         super(e);
+        this.uuid = uuid;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -28,15 +29,17 @@ public class GetSomethingController {
 
     @ExceptionHandler(AlreadyLoggedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrorsThatAreAlreadyLogged() {
+    public String handleUnexpectedErrorsThatAreAlreadyLogged(
+            AlreadyLoggedException e) {
         // Do not log
-        return "Error";
+        return "Error: " + e.getUuid();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
-        log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
-        return "Error";
+        final String uuid = UUID.randomUUID().toString();
+        log.error(uuid + " Unexpected error occurred on request: " + req.getServletPath(), e);
+        return "Error: " + uuid;
     }
 }
