@@ -3,12 +3,12 @@ package net.leejjon.demo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +27,12 @@ public class GetSomethingController {
         return "Hello";
     }
 
+    @PostMapping("/post")
+    public String postSomething(@Valid @RequestBody SomePost somePost) {
+        log.info(somePost.getEmail());
+        return "Posted";
+    }
+
     @ExceptionHandler(AlreadyLoggedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedErrorsThatAreAlreadyLogged(
@@ -41,5 +47,17 @@ public class GetSomethingController {
         final String uuid = UUID.randomUUID().toString();
         log.error(uuid + " Unexpected error occurred on request: " + req.getServletPath(), e);
         return "Error: " + uuid;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationErrors(HttpServletRequest req, MethodArgumentNotValidException e) {
+        StringBuilder validationErrorMessage = new StringBuilder("Validation error: \n");
+        for (ObjectError vallidationError : e.getAllErrors()) {
+            validationErrorMessage.append(vallidationError.getDefaultMessage());
+            validationErrorMessage.append("\n");
+        }
+
+        return validationErrorMessage.toString();
     }
 }
