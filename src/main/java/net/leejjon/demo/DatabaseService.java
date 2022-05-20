@@ -35,7 +35,8 @@ public class DatabaseService {
             log.error("Failed running query: " + sql);
             log.error("Parameters: param=" + param);
             log.error("Exception: ", e);
-            throw e;
+            throw new AlreadyLoggedException(e);
         }
     }
 }
+
