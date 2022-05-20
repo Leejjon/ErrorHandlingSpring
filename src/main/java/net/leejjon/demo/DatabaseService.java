@@ -4,23 +4,28 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
+import java.sql.*;
 @Service
 @Slf4j
 public class DatabaseService {
-    @SneakyThrows
-    public void runQuery(boolean extraParam) {
-        try {
-            if (extraParam) {
-                throw new SQLException();
-            }
-        } catch (SQLException e) {
-            final String uuid = UUID.randomUUID().toString();
-            log.error(uuid + " Got error " + e.getMessage() +
-                    " on query select * from data where extraParam = " + extraParam, e);
-            throw new AlreadyLoggedException(e, uuid);
+    final Connection con;
+
+    public DatabaseService() throws SQLException {
+        con = DriverManager.getConnection(
+            "jdbc:hsqldb:mem:testdb;DB_CLOSE_DELAY=-1"
+        );
+    }
+
+    public void runQuery(boolean extraParam)
+            throws SQLException {
+        String sql = "select * from records";
+        if (extraParam) {
+            sql += " where extraParam = ?";
         }
+        PreparedStatement ps = con.prepareStatement(sql);
+        if (extraParam) {
+            ps.setString(1, Boolean.toString(extraParam));
+        }
+        ps.executeQuery();
     }
 }
