@@ -16,16 +16,11 @@ public class DatabaseService {
         );
     }
 
-    public void runQuery(boolean extraParam)
-            throws SQLException {
-        String sql = "select * from records";
-        if (extraParam) {
-            sql += " where extraParam = ?";
-        }
+    @SneakyThrows
+    public void runQuery(boolean extraParam) {
+        String sql = "select * from records where extraParam = ?";
         PreparedStatement ps = con.prepareStatement(sql);
-        if (extraParam) {
-            ps.setString(1, Boolean.toString(extraParam));
-        }
+        ps.setString(1, Boolean.toString(extraParam));
         ps.executeQuery();
     }
 }
