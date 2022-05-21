@@ -1,12 +1,11 @@
 package net.leejjon.demo;
 
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+
 @Service
-@Slf4j
 public class DatabaseService {
     final Connection con;
 
@@ -20,7 +19,7 @@ public class DatabaseService {
     public void runQuery(boolean extraParam) {
         String sql = "select * from records where extraParam = ?";
         PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, Boolean.toString(extraParam));
+        ps.setBoolean(1, extraParam);
         ps.executeQuery();
     }
 }
