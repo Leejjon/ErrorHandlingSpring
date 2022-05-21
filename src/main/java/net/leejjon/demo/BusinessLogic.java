@@ -14,6 +14,6 @@ public class BusinessLogic {
 
     public void doBusinessLogic() {
         // TODO: Pretend there is happening some logic
-        databaseService.runQuery();
+        databaseService.runQuery(true);
     }
 }
