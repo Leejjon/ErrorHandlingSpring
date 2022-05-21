@@ -6,8 +6,8 @@ public class AlreadyLoggedException extends RuntimeException {
     @Getter
     private final String uuid;
 
-    public AlreadyLoggedException(Exception e) {
+    public AlreadyLoggedException(Exception e, final String uuid) {
         super(e);
-        this.uuid = "uuid";
+        this.uuid = uuid;
     }
 }

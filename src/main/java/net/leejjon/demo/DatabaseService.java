@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -32,10 +33,11 @@ public class DatabaseService {
                     }, param);
             log.info("We retrieved " + ids.size() + " records.");
         } catch (DataAccessException e) {
-            log.error("Failed running query: " + sql);
-            log.error("Parameters: param=" + param);
-            log.error("Exception: ", e);
-            throw new AlreadyLoggedException(e);
+            final String uuid = UUID.randomUUID().toString();
+            log.error(uuid + "Failed running query: " + sql);
+            log.error(uuid + "Parameters: param=" + param);
+            log.error(uuid + "Exception: ", e);
+            throw new AlreadyLoggedException(e, uuid);
         }
     }
 }
