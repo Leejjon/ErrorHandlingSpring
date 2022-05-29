@@ -34,9 +34,9 @@ public class DatabaseService {
             log.info("We retrieved " + ids.size() + " records.");
         } catch (DataAccessException e) {
             final String uuid = UUID.randomUUID().toString();
-            log.error(uuid + "Failed running query: " + sql);
-            log.error(uuid + "Parameters: param=" + param);
-            log.error(uuid + "Exception: ", e);
+            log.error(uuid + " Failed running query: " + sql);
+            log.error(uuid + " Parameters: param=" + param);
+            log.error(uuid + " Exception: ", e);
             throw new AlreadyLoggedException(e, uuid);
         }
     }
