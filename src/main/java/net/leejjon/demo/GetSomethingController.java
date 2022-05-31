@@ -2,6 +2,8 @@ package net.leejjon.demo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -19,10 +21,13 @@ import java.util.UUID;
 @Validated
 @RestController
 public class GetSomethingController {
+
     private final BusinessLogic businessLogic;
+    private final Tracer tracer;
 
     @Autowired
-    public GetSomethingController(BusinessLogic businessLogic) {
+    public GetSomethingController(Tracer tracer, BusinessLogic businessLogic) {
+        this.tracer = tracer;
         this.businessLogic = businessLogic;
     }
 
@@ -32,50 +37,51 @@ public class GetSomethingController {
         return "Hello: " + name;
     }
 
-    @PostMapping("/post")
-    public String postSomething(@Valid @RequestBody SomePost somePost) {
-        log.info(somePost.getEmail());
-        return "Posted";
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationError() {
-        return "Bad request";
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleMissingRequestParameterError() {
-        return "Bad request";
-    }
-
     @ExceptionHandler(AlreadyLoggedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrorsThatAreAlreadyLogged(
-
-            AlreadyLoggedException e) {
+    public String handleUnexpectedErrorsThatAreAlreadyLogged() {
         // Do not log
-        return "Error: " + e.getUuid();
+        return "Error: " + tracer.currentSpan().context().traceId();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
-        final String uuid = UUID.randomUUID().toString();
-        log.error(uuid + " Unexpected error occurred on request: " + req.getServletPath(), e);
-        return "Error: " + uuid;
+        log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
+        return "Error: " + tracer.currentSpan().context().traceId();
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationErrors(MethodArgumentNotValidException e) {
-        StringBuilder validationErrorMessage = new StringBuilder("Validation error: \n");
-        for (ObjectError vallidationError : e.getAllErrors()) {
-            validationErrorMessage.append(vallidationError.getDefaultMessage());
-            validationErrorMessage.append("\n");
-        }
-
-        return validationErrorMessage.toString();
-    }
+    // Other handlers
 }
+
+//    @PostMapping("/post")
+//    public String postSomething(@Valid @RequestBody SomePost somePost) {
+//        log.info(somePost.getEmail());
+//        return "Posted";
+//    }
+//
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public String handleValidationError() {
+//        return "Bad request";
+//    }
+//
+//    @ExceptionHandler(MissingServletRequestParameterException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public String handleMissingRequestParameterError() {
+//        return "Bad request";
+//    }
+//
+//
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public String handleValidationErrors(MethodArgumentNotValidException e) {
+//        StringBuilder validationErrorMessage = new StringBuilder("Validation error: \n");
+//        for (ObjectError vallidationError : e.getAllErrors()) {
+//            validationErrorMessage.append(vallidationError.getDefaultMessage());
+//            validationErrorMessage.append("\n");
+//        }
+//
+//        return validationErrorMessage.toString();
+//    }
+//}

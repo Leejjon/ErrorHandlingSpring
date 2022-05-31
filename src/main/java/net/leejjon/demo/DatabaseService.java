@@ -2,6 +2,8 @@ package net.leejjon.demo;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,6 +16,9 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class DatabaseService {
+    @Autowired
+    private Tracer tracer;
+
     private JdbcTemplate jdbcTemplate;
 
     public DatabaseService(JdbcTemplate jdbcTemplate) {
@@ -33,11 +38,10 @@ public class DatabaseService {
                     }, param);
             log.info("We retrieved " + ids.size() + " records.");
         } catch (DataAccessException e) {
-            final String uuid = UUID.randomUUID().toString();
-            log.error(uuid + " Failed running query: " + sql);
-            log.error(uuid + " Parameters: param=" + param);
-            log.error(uuid + " Exception: ", e);
-            throw new AlreadyLoggedException(e, uuid);
+            log.error("Failed running query: " + sql);
+            log.error(" Parameters: param=" + param);
+            log.error(" Exception: ", e);
+            throw new AlreadyLoggedException(e);
         }
     }
 }
