@@ -2,6 +2,7 @@ package net.leejjon.demo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -13,16 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-import java.util.UUID;
 
 @Slf4j
 @Validated
 @RestController
 public class GetSomethingController {
+
     private final BusinessLogic businessLogic;
+    private final Tracer tracer;
 
     @Autowired
-    public GetSomethingController(BusinessLogic businessLogic) {
+    public GetSomethingController(Tracer tracer, BusinessLogic businessLogic) {
+        this.tracer = tracer;
         this.businessLogic = businessLogic;
     }
 
@@ -30,6 +33,20 @@ public class GetSomethingController {
     public String getSomething(@RequestParam @Valid @Size(min = 3, max = 10) String name) {
         businessLogic.doBusinessLogic();
         return "Hello: " + name;
+    }
+
+    @ExceptionHandler(AlreadyLoggedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleUnexpectedErrorsThatAreAlreadyLogged() {
+        // Do not log
+        return "Error: " + tracer.currentSpan().context().traceId();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
+        log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
+        return "Error: " + tracer.currentSpan().context().traceId();
     }
 
     @PostMapping("/post")
@@ -50,22 +67,6 @@ public class GetSomethingController {
         return "Bad request";
     }
 
-    @ExceptionHandler(AlreadyLoggedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrorsThatAreAlreadyLogged(
-
-            AlreadyLoggedException e) {
-        // Do not log
-        return "Error: " + e.getUuid();
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
-        final String uuid = UUID.randomUUID().toString();
-        log.error(uuid + " Unexpected error occurred on request: " + req.getServletPath(), e);
-        return "Error: " + uuid;
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
