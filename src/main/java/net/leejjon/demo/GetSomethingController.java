@@ -51,37 +51,34 @@ public class GetSomethingController {
         return "Error: " + tracer.currentSpan().context().traceId();
     }
 
-    // Other handlers
-}
+    @PostMapping("/post")
+    public String postSomething(@Valid @RequestBody SomePost somePost) {
+        log.info(somePost.getEmail());
+        return "Posted";
+    }
 
-//    @PostMapping("/post")
-//    public String postSomething(@Valid @RequestBody SomePost somePost) {
-//        log.info(somePost.getEmail());
-//        return "Posted";
-//    }
-//
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public String handleValidationError() {
-//        return "Bad request";
-//    }
-//
-//    @ExceptionHandler(MissingServletRequestParameterException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public String handleMissingRequestParameterError() {
-//        return "Bad request";
-//    }
-//
-//
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public String handleValidationErrors(MethodArgumentNotValidException e) {
-//        StringBuilder validationErrorMessage = new StringBuilder("Validation error: \n");
-//        for (ObjectError vallidationError : e.getAllErrors()) {
-//            validationErrorMessage.append(vallidationError.getDefaultMessage());
-//            validationErrorMessage.append("\n");
-//        }
-//
-//        return validationErrorMessage.toString();
-//    }
-//}
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationError() {
+        return "Bad request";
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleMissingRequestParameterError() {
+        return "Bad request";
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationErrors(MethodArgumentNotValidException e) {
+        StringBuilder validationErrorMessage = new StringBuilder("Validation error: \n");
+        for (ObjectError vallidationError : e.getAllErrors()) {
+            validationErrorMessage.append(vallidationError.getDefaultMessage());
+            validationErrorMessage.append("\n");
+        }
+
+        return validationErrorMessage.toString();
+    }
+}
