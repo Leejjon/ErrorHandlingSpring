@@ -21,11 +21,9 @@ import javax.validation.constraints.Size;
 public class GetSomethingController {
 
     private final BusinessLogic businessLogic;
-    private final Tracer tracer;
 
     @Autowired
-    public GetSomethingController(Tracer tracer, BusinessLogic businessLogic) {
-        this.tracer = tracer;
+    public GetSomethingController(BusinessLogic businessLogic) {
         this.businessLogic = businessLogic;
     }
 
@@ -39,14 +37,14 @@ public class GetSomethingController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedErrorsThatAreAlreadyLogged() {
         // Do not log
-        return "Error: " + tracer.currentSpan().context().traceId();
+        return "Error";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedErrors(HttpServletRequest req, Exception e) {
         log.error("Unexpected error occurred on request: " + req.getServletPath(), e);
-        return "Error: " + tracer.currentSpan().context().traceId();
+        return "Error";
     }
 
     @PostMapping("/post")
